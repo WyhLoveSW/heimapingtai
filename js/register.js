@@ -7,5 +7,5 @@ resBtn.addEventListener('click', async (e) => {
   //判断账号密码的长度
   if (data.username.length < 6 || data.password.length < 6) return Toast('账号密码长度不符合要求')
   const res = await axios.post('/register', data)
-  Toast(res.data.message)
+  Toast(res.message)
 })
