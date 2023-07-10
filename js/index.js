@@ -6,9 +6,12 @@ showUsername()
 logout()
 //渲染统计数据 获取数据 渲染到页面上
 const getData = async () => {
-  const { data: { overview, year } } = await axios.get('/dashboard')
+  const res = await axios.get('/dashboard')
+  console.log(res);
+  const { data: { overview, year, salaryData, provinceData, groupData } } = res
   renderOverview(overview)
   renderYear(year)
+  renderSalaryData(salaryData)
 }
 getData()
 
@@ -18,6 +21,63 @@ const renderOverview = (overview) => {
     document.querySelector(`.${item}`).innerHTML = overview[item]
   })
 }
+
+const renderSalaryData = (salaryData) => {
+
+  var myChart = echarts.init(document.querySelector('#salary'))
+  option = {
+    tooltip: {
+      trigger: 'item'
+    },
+    title: {
+      text: '班级薪资分布',
+      left: 10,
+      top: 10,
+    },
+    legend: {
+      bottom: '5%',
+      left: 'center'
+    },
+    series: [
+      {
+        name: '班级薪资分布',
+        type: 'pie',
+        radius: ['40%', '50%'],
+        avoidLabelOverlap: false,
+        itemStyle: {
+          borderRadius: 10,
+          borderColor: '#fff',
+          borderWidth: 2
+        },
+        //提升文字
+        label: {
+          show: false,
+          position: 'center'
+        },
+        //高亮的扇区样式
+        // emphasis: {
+        //   label: {
+        //     show: true,
+        //     fontSize: 40,
+        //     fontWeight: 'bold'
+        //   }
+        // },
+        //连接线
+        labelLine: {
+          show: false
+        },
+        data: salaryData.map(item => ({
+          value: item.b_count + item.g_count,
+          name: item.label
+        }))
+
+      }
+    ],
+    color: ['#fda224', '#5097ff', '#3abcfa', '#34d39a']
+  }
+  myChart.setOption(option)
+}
+
 
 // 柱状图
 const renderYear = (year) => {
@@ -91,6 +151,10 @@ const renderYear = (year) => {
         }
       }
     ],
+    tooltip: {
+      show: true,
+      trigger: 'axis',
+    }
     // color: [
     //   {
     //     type: 'linear',
